@@ -1,13 +1,19 @@
 public class MyBigInteger {
     String value;
-    //    int numDigits = value.length();
+
     MyBigInteger(){
-        this.value = "0";
+        value = "0";
     }
 
-    MyBigInteger(String integer){
-        this.value = integer;
+    MyBigInteger(String val){
+        value = val;
     }
+
+    public String abbreviatedValue(){
+        return (this.value.length() < 12) ? this.value :
+                this.value.substring(0,5) + "..." + this.value.substring(this.value.length() - 5);
+    }
+
 
     public MyBigInteger plus(MyBigInteger b){
         if (this.value.length() < b.value.length()){
@@ -49,11 +55,56 @@ public class MyBigInteger {
         return c;
     }
 
-//    public static MyBigInteger times(MyBigInteger b){
-//        for (int i = b.value.length()-1; i <= 0 ; i++) {
-//
-//        }
-//    }
+    public MyBigInteger times(MyBigInteger b){
+
+        int currPowerOfTen = -1; //used for added 0's in multiplication
+        MyBigInteger temp1 = new MyBigInteger();
+        MyBigInteger temp2 = new MyBigInteger();
+        MyBigInteger c = new MyBigInteger();
+        for (int i = b.value.length()-1; i >= 0 ; i--) {
+            String result = "";
+            currPowerOfTen++;
+            int carry = 0;
+            for (int j = this.value.length() - 1; j >= 0; j--) {
+                int dA = convertToInt(this.value.charAt(j));
+                int dB = convertToInt(b.value.charAt(i));
+                int product = dA * dB + carry;
+                int dC = 0;
+                if (product >= 10 && j > 0) {
+                    carry = product / 10;
+                    dC = product % 10;
+                    result = dC + result;
+                } else if (product >= 10 && j == 0) {
+                    carry = product / 10;
+                    dC = product % 10;
+                    result = carry + String.valueOf(dC) + result;
+                } else{
+                    dC = product;
+                    carry = 0;
+                    result = convertToChar(dC) + result;
+                }
+            }
+            String appendZero = "0";
+            appendZero = appendZero.repeat(currPowerOfTen);
+            result += appendZero;
+            if (currPowerOfTen % 2 == 0) {
+                temp1.value = result;
+                if (currPowerOfTen > 0) {
+                    temp1 = temp2.plus(temp1);
+                }
+            }
+            else {
+                temp2.value = result;
+                temp2 = temp1.plus(temp2);
+            }
+
+        }
+        if (currPowerOfTen % 2 == 0)
+            return temp1;
+        else
+            return temp2;
+
+    }
 
     private int convertToInt(char c){
         return c - 48;
