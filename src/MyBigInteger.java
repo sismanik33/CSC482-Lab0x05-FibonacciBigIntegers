@@ -14,7 +14,6 @@ public class MyBigInteger {
                 this.value.substring(0,5) + "..." + this.value.substring(this.value.length() - 5);
     }
 
-
     public MyBigInteger plus(MyBigInteger b){
         if (this.value.length() < b.value.length()){
             int diff = b.value.length() - this.value.length();
@@ -60,7 +59,6 @@ public class MyBigInteger {
         int currPowerOfTen = -1; //used for added 0's in multiplication
         MyBigInteger temp1 = new MyBigInteger();
         MyBigInteger temp2 = new MyBigInteger();
-        MyBigInteger c = new MyBigInteger();
         for (int i = b.value.length()-1; i >= 0 ; i--) {
             String result = "";
             currPowerOfTen++;

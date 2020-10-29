@@ -1,22 +1,30 @@
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.math.BigInteger;
+import java.util.Hashtable;
+import java.util.Random;
 
 public class FibBig {
     public static void main(String[] args) {
 
         MyBigInteger x = new MyBigInteger("5579889987");
         MyBigInteger y = new MyBigInteger("5879899");
+
 //        MyBigInteger bigResult = x.times(y);
 
 //        multiplicationTest();
-
+//        additionTest();
 
 //        for (int i = 4; i < 100; i++) {
 //            MyBigInteger bigResult = fibMatrixBig(i);
 //            System.out.println(i + ": " + bigResult.value);
 //        }
 
-        MyBigInteger bigResult = fibLoopBig(500);
+        MyBigInteger bigResult = fibLoopBig(1000);
         System.out.println(bigResult.value);
+
+//        additionResultsTable();
+        multiplicationResultsTable();
 //        BigInteger myBigIntToBigInt = new BigInteger(bigResult.value);
 //        BigInteger fib300 = new BigInteger("222232244629420445529739893461909967206666939096499764990979600");
 //
@@ -35,26 +43,103 @@ public class FibBig {
 //        if (fib500.compareTo(convertFib500) == 0 )
 //            System.out.println(fib500.toString());
 
-
-
     }
 
+    public static void fibFunctionTest(){
+
+    }
     public static void multiplicationTest(){
-        for (long i = 1; i < 10000000; i*=2) {
-            for (long j = 1; j < 10000000; j*=3) {
+        boolean testFailed = false;
+        for (long i = 1; i < 1000000000; i*=2) {
+            for (long j = 1; j < 1000000000; j*=3) {
                 long result = i * j;
                 MyBigInteger iBig = new MyBigInteger(Long.toString(i));
                 MyBigInteger jBig = new MyBigInteger(Long.toString(j));
                 MyBigInteger kBig = iBig.times(jBig);
-                if (j % 729 == 0){
-                    System.out.println(iBig.value + " * " + jBig.value + " = " + kBig.abbreviatedValue());
+//                if (j % 531441 == 0){
+                if (i > 100000000){
+//                    System.out.println(iBig.value + " * " + jBig.value + " = " + kBig.value);
+                    System.out.format("%10s * %-10s  =  %-20s\n", iBig.value, jBig.value, kBig.value);
                 }
                 if (result != Long.parseLong(kBig.value)){
+                    testFailed = true;
                     System.out.println("Test failed: " + iBig.value + " * " + jBig.value + "does not equal: " + kBig.value);
                 }
             }
         }
+        if (!testFailed)
+            System.out.println("All calculated products matched the results of the long multiplications.");
     }
+
+    public static void additionTest(){
+        boolean testFailed = false;
+        for (long i = 1; i < 1000000000; i*=2) {
+            for (long j = 1; j < 1000000000; j*=3) {
+                long result = i + j;
+                MyBigInteger iBig = new MyBigInteger(Long.toString(i));
+                MyBigInteger jBig = new MyBigInteger(Long.toString(j));
+                MyBigInteger kBig = iBig.plus(jBig);
+//                if (j % 531441 == 0){
+                if (i > 100000000){
+//                    System.out.println(iBig.value + " * " + jBig.value + " = " + kBig.value);
+                    System.out.format("%10s + %-10s  =  %-20s\n", iBig.value, jBig.value, kBig.value);
+                }
+                if (result != Long.parseLong(kBig.value)){
+                    testFailed = true;
+                    System.out.println("Test failed: " + iBig.value + " * " + jBig.value + "does not equal: " + kBig.value);
+                }
+            }
+        }
+        if (!testFailed)
+            System.out.println("All calculated sums matched the results of the long additions.");
+    }
+
+    public static void additionResultsTable(){
+        System.out.format("%-10s|%14s + %-14s = %-14s%14s\n", "N", "x value 1:", "x value 2:", "sum", "time");
+
+        for (int N = 1; N < 200000000; N*=2) {
+            MyBigInteger a = new MyBigInteger(generateRandomNDigitNum(N));
+            MyBigInteger b = new MyBigInteger(generateRandomNDigitNum(N));
+
+            long before = getCpuTime();
+            MyBigInteger c = a.plus(b);
+            long after = getCpuTime();
+
+            System.out.format("%-10s|%14s + %-14s = %-14s%14s\n", N, a.abbreviatedValue(), b.abbreviatedValue(), c.abbreviatedValue(), after - before);
+
+        }
+    }
+
+    public static void multiplicationResultsTable(){
+        System.out.format("%-10s|%14s * %-14s = %-14s%14s\n", "N", "x", "y", "product", "time");
+
+        for (int N = 1; N < 2000000; N*=2) {
+            MyBigInteger a = new MyBigInteger(generateRandomNDigitNum(N));
+            MyBigInteger b = new MyBigInteger(generateRandomNDigitNum(N));
+
+            long before = getCpuTime();
+            MyBigInteger c = a.times(b);
+            long after = getCpuTime();
+
+            System.out.format("%-10s|%14s * %-14s = %-14s%14s\n", N, a.abbreviatedValue(), b.abbreviatedValue(), c.abbreviatedValue(), after - before);
+
+        }
+    }
+
+    public static String generateRandomNDigitNum(int N){
+        //code adapted from https://www.baeldung.com/java-random-string
+        int leftLimit = 48; // 0
+        int rightLimit = 57; // 9
+        int targetStringLength = N;
+        Random random = new Random();
+        String generatedString = random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+        return generatedString;
+    }
+
+
     public static MyBigInteger fibLoopBig(int x){
         MyBigInteger A = new MyBigInteger("0");
         MyBigInteger B = new MyBigInteger("1");
@@ -113,5 +198,13 @@ public class FibBig {
         MyBigInteger m[][]={{zeroZero,zeroOne},{oneZero,oneOne} };
         if(n%2!=0)
             multiply(F,m);
+    }
+
+    /** Get CPU time in nanoseconds since the program(thread) started. */
+    /** from: http://nadeausoftware.com/articles/2008/03/java_tip_how_get_cpu_and_user_time_benchmarking#TimingasinglethreadedtaskusingCPUsystemandusertime **/
+    public static long getCpuTime( ) {
+        ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
+        return bean.isCurrentThreadCpuTimeSupported( ) ?
+                bean.getCurrentThreadCpuTime( ) : 0L;
     }
 }
