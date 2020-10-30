@@ -6,25 +6,28 @@ import java.util.Random;
 
 public class FibBig {
     public static void main(String[] args) {
-
-        MyBigInteger x = new MyBigInteger("5579889987");
-        MyBigInteger y = new MyBigInteger("5879899");
-
-//        MyBigInteger bigResult = x.times(y);
-
-//        multiplicationTest();
+//
+//        MyBigInteger x = new MyBigInteger("1");
+//        MyBigInteger y = new MyBigInteger("0");
+//
+//        MyBigInteger z = x.times(y);
+//        System.out.println(z.value);
+//
+////        karatsubaTest();
 //        additionTest();
+//        multiplicationTest();
 
 //        for (int i = 4; i < 100; i++) {
 //            MyBigInteger bigResult = fibMatrixBig(i);
 //            System.out.println(i + ": " + bigResult.value);
 //        }
 
-        MyBigInteger bigResult = fibLoopBig(1000);
-        System.out.println(bigResult.value);
+//        MyBigInteger bigResult = fibLoopBig(1000);
+//        System.out.println(bigResult.value);
 
 //        additionResultsTable();
-        multiplicationResultsTable();
+//        multiplicationResultsTable();
+        compareToBigIntMultiplication();
 //        BigInteger myBigIntToBigInt = new BigInteger(bigResult.value);
 //        BigInteger fib300 = new BigInteger("222232244629420445529739893461909967206666939096499764990979600");
 //
@@ -58,12 +61,55 @@ public class FibBig {
                 MyBigInteger kBig = iBig.times(jBig);
 //                if (j % 531441 == 0){
                 if (i > 100000000){
-//                    System.out.println(iBig.value + " * " + jBig.value + " = " + kBig.value);
                     System.out.format("%10s * %-10s  =  %-20s\n", iBig.value, jBig.value, kBig.value);
                 }
                 if (result != Long.parseLong(kBig.value)){
                     testFailed = true;
                     System.out.println("Test failed: " + iBig.value + " * " + jBig.value + "does not equal: " + kBig.value);
+                }
+            }
+        }
+        if (!testFailed)
+            System.out.println("All calculated products matched the results of the long multiplications.");
+    }
+
+    public static void compareToBigIntMultiplication(){
+        for (int N = 1; N < 10000; N+=5) {
+            String rand1 = generateRandomNDigitNum(N);
+            String rand2 = generateRandomNDigitNum(N);
+            MyBigInteger a = new MyBigInteger(rand1);
+            MyBigInteger b = new MyBigInteger(rand2);
+            MyBigInteger c = a.times(b);
+            BigInteger x = new BigInteger(rand1);
+            BigInteger y = new BigInteger(rand2);
+
+            BigInteger expResult = x.multiply(y);
+            BigInteger calcResult = new BigInteger(c.value);
+
+            if (expResult.compareTo(calcResult) == 0){
+                System.out.format("%3s%-8d%10s * %-10s  =  %-20s\n", "N: ", N, a.abbreviatedValue(), b.abbreviatedValue(), c.abbreviatedValue());
+            }else {
+                    System.out.format("%****ERROR: 10s * %-10s  =  %-20s is not correct****\n", a.abbreviatedValue(), b.abbreviatedValue(), c.abbreviatedValue());
+            }
+
+        }
+    }
+
+    public static void karatsubaTest(){
+        boolean testFailed = false;
+        for (long i = 1; i < 100; i++) {
+            for (long j = 1; j < 100; j++) {
+                long result = i * j;
+                MyBigInteger iBig = new MyBigInteger(Long.toString(i));
+                MyBigInteger jBig = new MyBigInteger(Long.toString(j));
+                MyBigInteger kBig = iBig.karatsuba(jBig);
+//                if (j % 531441 == 0){
+                if (j % 3 == 0){
+                    System.out.format("%10s * %-10s  =  %-20s\n", iBig.value, jBig.value, kBig.value);
+                }
+                if (result != Long.parseLong(kBig.value)){
+                    testFailed = true;
+                    System.out.println("Test failed: " + iBig.value + " * " + jBig.value + " does not equal: " + kBig.value);
                 }
             }
         }
@@ -80,7 +126,7 @@ public class FibBig {
                 MyBigInteger jBig = new MyBigInteger(Long.toString(j));
                 MyBigInteger kBig = iBig.plus(jBig);
 //                if (j % 531441 == 0){
-                if (i > 100000000){
+                if (i > 1000000){
 //                    System.out.println(iBig.value + " * " + jBig.value + " = " + kBig.value);
                     System.out.format("%10s + %-10s  =  %-20s\n", iBig.value, jBig.value, kBig.value);
                 }
@@ -95,24 +141,28 @@ public class FibBig {
     }
 
     public static void additionResultsTable(){
-        System.out.format("%-10s|%14s + %-14s = %-14s%14s\n", "N", "x value 1:", "x value 2:", "sum", "time");
-
-        for (int N = 1; N < 200000000; N*=2) {
+        System.out.format("%-10s|%14s + %-14s = %-20s%-14s%-14s%20s\n", "N", "x value 1:", "x value 2:", "sum", "time", "doubling ratio", "exp doubling ratio");
+        long currTime;
+        long prevTime = 0;
+        for (int N = 1; N < 2000000000; N*=2) {
             MyBigInteger a = new MyBigInteger(generateRandomNDigitNum(N));
             MyBigInteger b = new MyBigInteger(generateRandomNDigitNum(N));
 
             long before = getCpuTime();
             MyBigInteger c = a.plus(b);
             long after = getCpuTime();
-
-            System.out.format("%-10s|%14s + %-14s = %-14s%14s\n", N, a.abbreviatedValue(), b.abbreviatedValue(), c.abbreviatedValue(), after - before);
-
+            currTime = after - before;
+            double actualDoubling = (N > 1) ? (double)currTime/(double)prevTime : 0.0;
+            System.out.format("%-10s|%14s + %-14s = %-20s%-14s%1.5f%20s\n", N, a.abbreviatedValue(),
+                    b.abbreviatedValue(), c.abbreviatedValue(), currTime, actualDoubling, "2");
+            prevTime = currTime;
         }
     }
 
     public static void multiplicationResultsTable(){
-        System.out.format("%-10s|%14s * %-14s = %-14s%14s\n", "N", "x", "y", "product", "time");
-
+        System.out.format("%-10s|%14s * %-14s = %-20s%-14s%-14s%20s\n", "N", "x", "y", "product", "time", "doubling ratio", "exp doubling ratio");
+        long currTime;
+        long prevTime = 0;
         for (int N = 1; N < 2000000; N*=2) {
             MyBigInteger a = new MyBigInteger(generateRandomNDigitNum(N));
             MyBigInteger b = new MyBigInteger(generateRandomNDigitNum(N));
@@ -120,9 +170,11 @@ public class FibBig {
             long before = getCpuTime();
             MyBigInteger c = a.times(b);
             long after = getCpuTime();
-
-            System.out.format("%-10s|%14s * %-14s = %-14s%14s\n", N, a.abbreviatedValue(), b.abbreviatedValue(), c.abbreviatedValue(), after - before);
-
+            currTime = after - before;
+            double actualDoubling = (N > 1) ? (double)currTime/(double)prevTime : 0.0;
+            System.out.format("%-10s|%14s * %-14s = %-20s%-14s%1.5f%20s\n", N, a.abbreviatedValue(),
+                    b.abbreviatedValue(), c.abbreviatedValue(), currTime, actualDoubling, "4");
+            prevTime = currTime;
         }
     }
 
