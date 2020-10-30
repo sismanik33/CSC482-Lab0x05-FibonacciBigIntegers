@@ -1,6 +1,8 @@
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.util.Hashtable;
 import java.util.Random;
 
@@ -27,7 +29,8 @@ public class FibBig {
 
 //        additionResultsTable();
 //        multiplicationResultsTable();
-        compareToBigIntMultiplication();
+//        compareToBigIntMultiplication();
+        genFibBigFunctionResultsTable(1);
 //        BigInteger myBigIntToBigInt = new BigInteger(bigResult.value);
 //        BigInteger fib300 = new BigInteger("222232244629420445529739893461909967206666939096499764990979600");
 //
@@ -74,7 +77,7 @@ public class FibBig {
     }
 
     public static void compareToBigIntMultiplication(){
-        for (int N = 1; N < 10000; N+=5) {
+        for (int N = 1; N < 100000; N*=2) {
             String rand1 = generateRandomNDigitNum(N);
             String rand2 = generateRandomNDigitNum(N);
             MyBigInteger a = new MyBigInteger(rand1);
@@ -192,6 +195,50 @@ public class FibBig {
     }
 
 
+    public static void genFibBigFunctionResultsTable(int testToRun){
+        long currTime;
+        long prevTime = 0;
+        long avgNTimes[] = new long[10];
+        long cumulativeNTime = 0;
+        String dash = "-";
+        dash = dash.repeat(105);
+        for (int i = 1; i < 100; i++) {
+            System.out.format("%-10s%-15s%-20s%-20s%10s%15s%15s\n", "N (size)", "X (input val)", "fib(X)", "Run Time", "10x Ratio", "T_x exp ratio", "T_n exp ratio");
+            for (int N = 1; N < 10; N++) {
+                cumulativeNTime = 0;
+                int nPowTen = (int)Math.pow(10, i - 1);
+                nPowTen = N * nPowTen;
+                long before;
+                long after;
+                MyBigInteger result = new MyBigInteger();
+                if (testToRun == 1) {
+                    before = getCpuTime();
+                    result = fibLoopBig(nPowTen);
+                    after = getCpuTime();
+                } else {
+                    before = getCpuTime();
+                    result = fibMatrixBig(nPowTen);
+                    after = getCpuTime();
+                }
+                currTime = after - before;
+                cumulativeNTime += currTime;
+                double tenRatio = (i > 1) ? (double)currTime/(double)prevTime : 0.0;
+                System.out.format("%-10s%-15s%-20s%-20s%1.9f%15s%15s\n", i, nPowTen, result.abbreviatedValue(), currTime, tenRatio, "-", "-");
+                prevTime = currTime;
+            }
+            avgNTimes[i] = cumulativeNTime/9;
+            System.out.println(dash);
+            if(i > 1)
+                System.out.format("%-10s%-15s%-20s%-20s%10s%15s%15s\n", "N = ", i, "summary:", avgNTimes[i], avgNTimes[i]/avgNTimes[i-1],
+                        (testToRun == 1) ? "4" : "-", (testToRun == 1) ? Math.pow(10,2) : "-");
+            else
+                System.out.format("%-10s%-15s%-20s%-20s%10s%15s%15s\n", "N = ", i, "summary:", avgNTimes[i], "-",
+                        (testToRun == 1) ? "4" : "-", (testToRun == 1) ? Math.pow(10,2) : "-");
+            System.out.println(dash);
+        }
+    }
+
+
     public static MyBigInteger fibLoopBig(int x){
         MyBigInteger A = new MyBigInteger("0");
         MyBigInteger B = new MyBigInteger("1");
@@ -223,6 +270,18 @@ public class FibBig {
 
         return F[0][0];
     }
+
+//    public static BigInteger fibFormula(int x, int precision){
+//        BigDecimal five = new BigDecimal("5");
+//        BigDecimal two = new BigDecimal("2");
+//        BigDecimal one = new BigDecimal("1");
+//        MathContext mc = new MathContext(precision);
+//        BigDecimal sqrt5 = five.sqrt(mc);
+//        BigDecimal phiNumerator = sqrt5.add(one, mc);
+//
+//        BigDecimal phi = phiNumerator.divide(two, mc);
+//        BigDecimal sqrt5toN = sqrt5.pow(x, mc);
+//    }
 
     static void multiply(MyBigInteger F[][], MyBigInteger M[][])
     {
