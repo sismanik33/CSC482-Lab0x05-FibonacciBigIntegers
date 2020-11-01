@@ -114,8 +114,10 @@ public class MyBigInteger {
     public MyBigInteger times(MyBigInteger b){
 
         int currPowerOfTen = -1; //used for added 0's in multiplication
-        MyBigInteger temp1 = new MyBigInteger();
-        MyBigInteger temp2 = new MyBigInteger();
+        int maxLen = (this.value.length() > b.value.length()) ? this.value.length() : b.value.length();
+        String zeroStr = "0".repeat(maxLen * 2);
+        MyBigInteger temp1 = new MyBigInteger(zeroStr);
+        MyBigInteger temp2 = new MyBigInteger(zeroStr);
         for (int i = b.value.length()-1; i >= 0 ; i--) {
             String result = "";
             currPowerOfTen++;
