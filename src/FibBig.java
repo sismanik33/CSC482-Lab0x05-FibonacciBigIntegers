@@ -12,34 +12,28 @@ public class FibBig {
 
 
 //        additionResultsTable();
-//        multiplicationResultsTable();
-        additionTest();
-        multiplicationTest();
-        compareToBigIntCalculations("+");
-        compareToBigIntCalculations("*");
+        multiplicationResultsTable();
+//        additionTest();
+//        multiplicationTest();
+//        compareToBigIntCalculations("+");
+//        compareToBigIntCalculations("*");
 //        genFibBigFunctionResultsTable(2);
-//        System.out.println(fibMatrixJavaBig(1000).toString());
-//        BigInteger myBigIntToBigInt = new BigInteger(bigResult.value);
-//        BigInteger fib300 = new BigInteger("222232244629420445529739893461909967206666939096499764990979600");
-//
-//        System.out.println(fib300.toString());
-//        if(fib300.compareTo(myBigIntToBigInt) == 0)
-//            System.out.println("They match!");
-//        MyBigInteger myBigFib400 = fibLoopBig(400);
-//        BigInteger fib400 = new BigInteger("176023680645013966468226945392411250770384383304492191886725992896575345044216019675");
-//        BigInteger convertFib400 = new BigInteger(myBigFib400.value);
-//        if (fib400.compareTo(convertFib400) == 0 )
-//            System.out.println(fib400.toString());
-//
-//        MyBigInteger myBigFib500 = fibLoopBig(500);
-//        BigInteger fib500 = new BigInteger("139423224561697880139724382870407283950070256587697307264108962948325571622863290691557658876222521294125");
-//        BigInteger convertFib500 = new BigInteger(myBigFib500.value);
-//        if (fib500.compareTo(convertFib500) == 0 )
-//            System.out.println(fib500.toString());
+//        genFibBigFunctionResultsTable(2);
+//        fibFunctionTest1000();
+
 
     }
 
-    public static void fibFunctionTest(){
+    public static void fibFunctionTest1000(){
+        for (int i = 990; i < 1001 ; i++) {
+            MyBigInteger loop = fibLoopBig(i);
+            MyBigInteger matrix = fibMatrixBig(i);
+            String dash = "-";
+            dash = dash.repeat(50);
+            System.out.println("X= " + i + " fibLoopBig returns:\t\t" + loop.abbreviatedValue());
+            System.out.println("X= " + i + " fibMatrixBig returns:\t" + loop.abbreviatedValue());
+            System.out.println(dash);
+        }
 
     }
     public static void multiplicationTest(){
@@ -51,8 +45,7 @@ public class FibBig {
                 MyBigInteger iBig = new MyBigInteger(Long.toString(i));
                 MyBigInteger jBig = new MyBigInteger(Long.toString(j));
                 MyBigInteger kBig = iBig.times(jBig);
-//                if (j % 531441 == 0){
-                if (i > 100000000){
+                if (j % 531441 == 0){
                     System.out.format("%10s * %-10s  =  %-20s\n", iBig.value, jBig.value, kBig.value);
                 }
                 if (result != Long.parseLong(kBig.value)){
@@ -119,16 +112,14 @@ public class FibBig {
 
     public static void additionTest(){
         boolean testFailed = false;
-        System.out.println("Adding all numbers below 1 billion with MyBigInt.plus and comparing results to Java long addition:");
+        System.out.println("Adding numbers below 1 billion with MyBigInt.plus and comparing results to Java long addition:");
         for (long i = 1; i < 1000000000; i*=2) {
             for (long j = 1; j < 1000000000; j*=3) {
                 long result = i + j;
                 MyBigInteger iBig = new MyBigInteger(Long.toString(i));
                 MyBigInteger jBig = new MyBigInteger(Long.toString(j));
                 MyBigInteger kBig = iBig.plus(jBig);
-//                if (j % 531441 == 0){
-                if (i > 1000000){
-//                    System.out.println(iBig.value + " * " + jBig.value + " = " + kBig.value);
+                if (j % 531441 == 0){
                     System.out.format("%10s + %-10s  =  %-20s\n", iBig.value, jBig.value, kBig.value);
                 }
                 if (result != Long.parseLong(kBig.value)){
@@ -217,28 +208,31 @@ public class FibBig {
                     after = getCpuTime();
                 } else {
                     before = getCpuTime();
-                    BigInteger soln = fibMatrixJavaBig(x);
-                    result.value = soln.toString();
-//                    result = fibMatrixBig(x);
+//                    BigInteger soln = fibMatrixJavaBig(x);
+//                    result.value = soln.toString();
+                    result = fibMatrixBig(x);
                     after = getCpuTime();
                 }
                 currTime[i] = after - before;
                 cumulativeNTime += currTime[i];
                 double tenRatio = (N > 1) ? (double)currTime[i]/(double)prevTime[i] : 0.0;
-                expTenXRatio = (testToRun == 1) ? 10.0 : Math.log(N);
-                expTenNRatio = (testToRun == 1) ? 100.0 : 100.0;
-                System.out.format("%-10s%-15s%-20s%-20s%10.5f%10.5f%10s\n", N, x, result.abbreviatedValue(), currTime[i], tenRatio, expTenXRatio, expTenNRatio);
+                expTenXRatio = (testToRun == 1) ? 4 : Math.log(x) * 4;
+                if (N > 1)
+                    expTenNRatio = (testToRun == 1) ? Math.pow(Math.log(N),2) : Math.pow(N, 2)/Math.pow((N-1),2);
+                else
+                    expTenNRatio = 0.0;
+                System.out.format("%-10s%-15s%-20s%-20s%10.5f%10.5f%10.5f\n", N, x, result.abbreviatedValue(), currTime[i], tenRatio, expTenXRatio, expTenNRatio);
                 prevTime[i] = currTime[i];
             }
-            avgNTimes[N] = cumulativeNTime/9;
-            System.out.println(dash);
-            if(N > 1)
-                System.out.format("%-10s%-15s%-20s%-20s%10.5f%10.5f%10s\n", "N = ", N, "average:", avgNTimes[N], (double)avgNTimes[N]/(double)avgNTimes[N-1],
-                        expTenXRatio, expTenNRatio);
-            else
-                System.out.format("%-10s%-15s%-20s%-20s%10s%10s%10s\n", "N = ", N, "average:", avgNTimes[N], "-",
-                        expTenXRatio, expTenNRatio);
-            System.out.println(dash);
+//            avgNTimes[N] = cumulativeNTime/9;
+//            System.out.println(dash);
+//            if(N > 1)
+//                System.out.format("%-10s%-15s%-20s%-20s%10.5f%10.5f%10s\n", "N = ", N, "average:", avgNTimes[N], (double)avgNTimes[N]/(double)avgNTimes[N-1],
+//                        expTenXRatio, expTenNRatio);
+//            else
+//                System.out.format("%-10s%-15s%-20s%-20s%10s%10s%10s\n", "N = ", N, "average:", avgNTimes[N], "-",
+//                        expTenXRatio, expTenNRatio);
+//            System.out.println(dash);
         }
     }
 
@@ -260,17 +254,17 @@ public class FibBig {
         return B;
     }
 
-    public static MyBigInteger fibMatrixBig(int n){
+    public static MyBigInteger fibMatrixBig(int x){
         MyBigInteger zeroZero = new MyBigInteger("1");
         MyBigInteger zeroOne = new MyBigInteger("1");
         MyBigInteger oneZero = new MyBigInteger("1");
         MyBigInteger oneOne = new MyBigInteger("0");
         MyBigInteger F[][] = new MyBigInteger[][]{ {zeroZero,zeroOne},{oneZero,oneOne} };
-        if (n == 0){
+        if (x == 0){
             MyBigInteger zero = new MyBigInteger("0");
             return zero;
         }
-        power(F, n-1);
+        power(F, x-1);
 
         return F[0][0];
     }
@@ -300,10 +294,10 @@ public class FibBig {
         F[1][1] = w;
     }
 
-    static void power(MyBigInteger F[][], int n)
+    static void power(MyBigInteger F[][], int x)
     {
-        if(n==0 || n==1) return;
-        power(F,n/2);
+        if(x==0 || x==1) return;
+        power(F,x/2);
         multiply(F,F);
 
         MyBigInteger zeroZero = new MyBigInteger("1");
@@ -311,7 +305,7 @@ public class FibBig {
         MyBigInteger oneZero = new MyBigInteger("1");
         MyBigInteger oneOne = new MyBigInteger("0");
         MyBigInteger m[][]={{zeroZero,zeroOne},{oneZero,oneOne} };
-        if(n%2!=0)
+        if(x%2!=0)
             multiply(F,m);
     }
 
